@@ -1,0 +1,10 @@
+name: answer
+title:
+username:
+account: irene-web
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 1914224
+bundleId: 2857553
+url: https://irene-web.shinyapps.io/answer/
+when: 1583508886.4168
