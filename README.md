@@ -1,15 +1,24 @@
 # :tangerine: Bitamin 4기: 세션자료 :tangerine:
- - 비타민 교육부로 활동하면서, **세션 교육자료**로 활용 <br>
+ - 비타민 교육부로 활동하면서, **세션 교육자료**로 활용되었음 <br>
 ※ 모든 세션 자료가 아닌, 직접 만든 세션 자료만 업로드 되어있음.
 
 ## :tangerine: 2학기-1주차 세션 : 머신러닝 기초 <br>
 <p align="center">
-<img src="https://user-images.githubusercontent.com/59464528/88047285-5cbd6f00-cb8c-11ea-9b7d-4f71da7f2f8d.png" width="48%"/> 
-<img src = "https://user-images.githubusercontent.com/59464528/88151092-34da1400-cc3d-11ea-96c9-f0ce261f3cfa.png" width="48%">
+<img src="https://user-images.githubusercontent.com/59464528/89758263-56cf0400-db22-11ea-9a97-caa646563f96.png" width="48%"/> 
+<img src = "https://user-images.githubusercontent.com/59464528/89758313-749c6900-db22-11ea-97ea-758d488aab3d.png" width="48%">
 </p>
 
-## :tangerine: 2학기-15주차 세션 : 병렬처리/ markdown/ github <br>
+### :page_with_curl: 예습과제
+ - 피피티 내의 모든 r 코드 쳐서 제출
 
+### :speech_balloon: 세션 내용
+ - 머신러닝 모델들을 배우기 전에 공통적으로 알아야 할 개념
+ 1. EDA (시각화)
+ 2. Pre-Processing(전처리)
+ 3. 성능평가
+
+
+## :tangerine: 2학기-15주차 세션 : 병렬처리/ markdown/ github <br>
 <p align="center">
 <img src="https://user-images.githubusercontent.com/59464528/88047285-5cbd6f00-cb8c-11ea-9b7d-4f71da7f2f8d.png" width="48%"/> 
 <img src = "https://user-images.githubusercontent.com/59464528/88151092-34da1400-cc3d-11ea-96c9-f0ce261f3cfa.png" width="48%">
