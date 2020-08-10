@@ -2,6 +2,8 @@
  - 비타민 교육부로 활동하면서, **세션 교육자료**로 활용되었음 <br>
 ※ 모든 세션 자료가 아닌, 직접 만든 세션 자료만 업로드 되어있음.
 
+<br>
+
 ## :tangerine: 2학기-1주차 세션 : 머신러닝 기초 <br>
 <p align="center">
 <img src="https://user-images.githubusercontent.com/59464528/89758263-56cf0400-db22-11ea-9a97-caa646563f96.png" width="48%"/> 
@@ -17,6 +19,24 @@
  2. Pre-Processing(전처리)
  3. 성능평가
 
+<br>
+
+## :tangerine: 2학기-3주차 세션 : rshiny <br>
+<p align="center">
+<img src="https://user-images.githubusercontent.com/59464528/89758421-b4635080-db22-11ea-9e8b-b0a4c636708f.png" width="48%"/> 
+<img src = "https://user-images.githubusercontent.com/59464528/89758437-bd542200-db22-11ea-9b9a-3497150ba7d0.png" width="48%">
+</p>
+
+### :page_with_curl: 예습과제
+ - 피피티 내의 모든 r 코드 쳐서 제출
+
+### :speech_balloon: 세션 내용
+ - rshiny를 통한 앱 배포
+ 1. rshiny 구조 소개
+ 2. rshiny 기본 코드
+ 3. reactive (인터렉티브) rshiny
+
+<br>
 
 ## :tangerine: 2학기-15주차 세션 : 병렬처리/ markdown/ github <br>
 <p align="center">
