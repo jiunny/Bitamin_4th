@@ -1,0 +1,297 @@
+---
+title: "Plotly"
+author: "최지은"
+date: '2020 7 21 '
+output:
+  html_document:
+    theme: yeti
+    hightlight: tango
+    toc: true
+    toc_float:
+      collapsed: True
+    toc_depth : 3
+    #number_sections: true
+    df_print: paged
+
+---
+
+<style type="text/css">
+
+body{ /* Normal  */
+      font-size: 16px;
+      font-family: "Malgun Gothic";
+      line-height: 1.5;
+  }
+td {  /* Table  */
+  font-size: 9px;
+  font-family: "Malgun Gothic";
+}
+h1.title {
+  font-size: 40px;
+  font-weight: bold;
+  color: DarkRed;
+}
+h1 { /* Header 1 */
+  font-size: 28px;
+  font-weight: bold;
+  color: DarkBlue;
+}
+h2 { /* Header 2 */
+  font-size: 22px;
+  font-weight: bold;
+  color: DarkBlue;
+}
+h3 { /* Header 3 */
+  font-size: 19px;
+  font-weight: bold;
+  font-family: "Malgun Gothic";
+}
+
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment = '',
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.align = 'center')
+```
+
+
+***
+&nbsp;&nbsp;&nbsp;&nbsp; 데이터가 조금 커서 일반 노트북으로 그리기에는 자원 문제가 있을 수 있습니다. 따라서, 아래의 모든 plotly 데이터는 filter를 통해서 크기를 줄여서 사용하겠습니다. 만약, 컴퓨터 자원이 버틸 수 있다고 판단되면, filter를 빼고 하셔도 됩니다! (※ 참고로 제 컴은 견디지 못했어요..ㅠ) <br/>
+
+***
+
+
+# 0. Loading Package
+
+```{r}
+library(plotly)
+library(dplyr)
+library(ggplot2)
+
+library(nycflights13)
+data("flights")
+```
+
+#### < 사용할 데이터 >
+&nbsp;&nbsp;&nbsp;&nbsp; `nycflights13` 패키지에서 제공하는 flights 내장데이터를 이용할 것입니다. flights는 2013년에 운항된 비행기 지연여부에 대한 데이터로 **336776**개의 행과 **19**개의 변수로 이루어진 대용량 데이터 입니다.
+ 
+```{r}
+head(flights)
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp; 시간과 날짜에 대해서 전처리가 필요한 데이터이지만, 시간 관계상 전처리 된 데이터를 올려드립니다. 카페에 올려드린 **`flights.RDS`** 파일을 불러와 주세요.
+ 
+```{r}
+flights_data = readRDS("C:/Users/jieun/Desktop/flights.RDS")
+```
+
+<br/>
+
+***
+
+# 1. Plotly 기초
+### 1-1. **ggplot**을 사용해서 그릴 경우 <br/>
+&nbsp;&nbsp;&nbsp;&nbsp; **delay**가 되었는지에 따라 shape를 다르게 주어 ggplot을 그렸을 때, 그래프가 서로 몰려있어 추세를 정확히 파악하기 힘듭니다.
+
+```{r}
+
+flights_data %>% 
+  na.omit() %>% 
+  mutate(delay = as.factor(ifelse(dep_delay>30,1,0))) %>% 
+  arrange(dep_dt) %>%
+  filter(month==1) %>% 
+  ggplot(aes(x=dep_dt,y=dep_delay,
+             shape= delay, col=delay)) +
+  geom_point()+
+  theme_bw()
+
+```
+
+같은 그래프를 plotly로 그려보았을 때, 어떻게 다른지 살펴봅시다.
+
+### 1-2. **plotly**를 사용해서 그릴 경우 <br/>
+
+&nbsp;&nbsp;&nbsp;&nbsp; 메모리 문제를 해결하기 위하여 `filter()` 를 사용하여 데이터 크기를 줄였습니다.
+
+> ##### **`x & y`** : 데이터의 변수명이기 때문에 **`~변수명`**으로 사용.
+>
+> ##### **`type=scatter`** 산점도 플랏을 그려줍니다.
+
+```{r}
+library(dplyr)
+flights_data %>% 
+  na.omit() %>% 
+  arrange(dep_dt) %>%
+  filter(month==1) %>% 
+  filter(carrier == c('9E','AA','AS','EV','EL')) -> graph_data
+
+```
+
+```{r}
+graph_data %>% 
+  plot_ly(
+    x = ~dep_dt,
+    y = ~dep_delay,
+    type="scatter"
+  )
+```
+
+<br/>
+
+***
+
+# 2. Plotly color, symbol
+### 2-1. **color** 추가 <br/>
+
+&nbsp;&nbsp;&nbsp;&nbsp; **1-2**의 코드에서 color만 추가. carrier(항공사)에 따라서 색상이 구분됩니다. 오른쪽에 나타나는 범례에서 범주를 **더블 클릭**하면 해당 범주의 분포만 확인 가능합니다.
+
+```{r}
+graph_data %>% 
+  plot_ly(
+    x = ~dep_dt,
+    y = ~dep_delay,
+    color = ~carrier,
+    type="scatter"
+  )
+```
+
+
+&nbsp;&nbsp;&nbsp;&nbsp; 원래 있는 변수가 아니라 **새로운 변수에 대해서 색상**을 부여하고 싶다면 `dplyr`의 `mutate()` 함수를 이용하여 새로운 객체를 만들지 않고 그릴 수 있습니다.
+
+&nbsp;&nbsp;&nbsp;&nbsp; 지연에 따른 분포를 보고 싶다고 가정하면 현재 데이터는 지연을 알려주는 변수가 존재하지 않습니다. 따라서,  `dep_delay(이륙 지연 시간)`에서 30분이 넘을 경우는 지연(1), 아닐 경우는 정상(0)을 가지는 **for_color** 변수를 생성하고, plot_ly의 color 부분에 넣어주었습니다.
+
+
+```{r}
+graph_data %>% 
+  mutate(for_color = as.factor(ifelse(dep_delay > 30,1,0))) %>% 
+  plot_ly(
+    x = ~dep_dt,
+    y = ~dep_delay,
+    color = ~for_color,
+    type="scatter"
+  )
+```
+
+
+
+### 2-2. **shape** 추가 <br/>
+
+&nbsp;&nbsp;&nbsp;&nbsp; **모양**을 추가하고 싶은 경우 **`symbol`** 파라미터를 추가하면 됩니다.
+
+> ##### **`symbol`** : 모양으로 구분할 변수명(벡터명)
+>
+> ##### **`symbols`** : 모양 설정(plot에서 pch와 같음)
+>
+> ##### **`marker = list(size=4)`**은 모양의 크기를 결정합니다.(plot에서 cex와 같음)
+
+```{r}
+graph_data %>% 
+  mutate(for_color = as.factor(ifelse(dep_delay > 30,"delay","normal"))) %>% 
+  plot_ly(
+    x = ~dep_dt,
+    y = ~dep_delay,
+    symbol = ~for_color,
+    symbols = c("x","circle"),
+    marker = list(size=4),
+    type="scatter"
+  )
+```
+
+
+
+### 2-3. **활용방안** <br/>
+
+&nbsp;&nbsp;&nbsp;&nbsp; 지연이 30분을 넘어가면 보통 지연이라고 판단합니다. 이를 기준으로 출발지연과, 도착지연을 표현하는 그래프를 그려봅시다. 색상 팔레트를 다르게 주고 싶다면, 직접 색상명을 입력해도 되고, ggplot의 palette 중에서도 사용 가능합니다. **`opacity`**는 투명도 입니다.
+
+```{r}
+graph_data %>% 
+  mutate(both_delay = as.factor(ifelse(dep_delay > 30 & arr_delay > 30,"출발&도착_지연",
+                                       ifelse(dep_delay > 30 & arr_delay <= 30, "출발지연",
+                                              ifelse(dep_delay <= 30 & arr_delay > 30, "도착지연", "정상"))))) %>% 
+  plot_ly(
+    x = ~dep_dt,
+    y = ~dep_delay,
+    color = ~both_delay,
+    colors= 'Set1',
+    symbol = ~both_delay,
+    marker = list(opacity = 0.7, size=5),
+    type="scatter"
+  )#opactiy:투명도
+```
+
+***
+
+# 3. Plotly x,y 축
+
+&nbsp;&nbsp;&nbsp;&nbsp; **X축과 Y축** 이름을 넣거나, 그래프 Title을 넣고 싶을 때는 **`layout()`**을 사용합니다.
+
+> ##### **`title`** 은 그래프 제목을 의미
+>
+> ##### **`zeroline`**은 좌표축을 그릴건지 묻는 것
+>
+> ##### **`showgrid`**은 x축과 y축의 참조선을 보여줄지를 묻는 것
+
+```{r}
+graph_data %>% 
+  mutate(both_delay = as.factor(ifelse(dep_delay > 30 & arr_delay > 30,"출발&도착_지연",
+                                       ifelse(dep_delay > 30 & arr_delay <= 30, "출발지연",
+                                              ifelse(dep_delay <= 30 & arr_delay > 30, "도착지연", "정상"))))) %>% 
+  plot_ly(
+    x = ~dep_dt,
+    y = ~dep_delay,
+    color = ~both_delay,
+    colors= 'Set1',
+    symbol = ~both_delay,
+    marker = list(opacity = 0.7, size=5),
+    type="scatter"
+  )%>% 
+  layout(title='이륙시 지연과 착륙시 지연의 상관관계',
+         xaxis = list(title = '이륙시간',
+                      zeroline = TRUE
+         ),
+         yaxis = list(title = '이륙 지연시간',
+                      showgrid = FALSE))
+```
+
+***
+
+# 4. Plotly text 사용하기
+
+&nbsp;&nbsp;&nbsp;&nbsp; 특정 점에 마우스를 올리면 text tooltip을 보여주는 기능을 사용해 봅시다. 특정 좌표에 마우스를 올리는 것을 **hover** 이라고 칭하기 때문에, **`hoverinfo`**라는 파라미터가 추가됩니다.
+
+> ##### **`hoverinfo = 'text'`** : 마우스를 올리면 text를 보여주겠다 라는 의미 
+>
+> ##### **`text`** : 마우스를 올렸을 때 보여줄 text 문구를 작성. (paste 함수 사용하는 방법과 동일) <br/> 단, paste 함수에서는 html 문법을 사용하기 때문에, 줄 바꿈과 볼드체 같은 문법은 **html 문법**으로 작성해야함. 
+
+
+```{r}
+graph_data%>% 
+  mutate(both_delay = as.factor(ifelse(dep_delay > 30 & arr_delay > 30,"출발&도착_지연",
+                                       ifelse(dep_delay > 30 & arr_delay <= 30, "출발지연",
+                                              ifelse(dep_delay <= 30 & arr_delay > 30, "도착지연", "정상"))))) %>%
+  plot_ly(
+    x = ~dep_dt,
+    y = ~dep_delay,
+    color = ~both_delay,
+    colors= 'Set1',
+    symbol = ~both_delay,
+    marker = list(opacity = 0.7, size=5),
+    type="scatter",
+    hoverinfo = 'text',
+    text = ~paste0("<b>", "항공사: ",carrier, "</b> <br>",
+                   "출발지연: ", ifelse(dep_delay > 30, "yes","no"), "<br>",
+                   "도착지연: ",ifelse(arr_delay > 30, "yes","no"))
+  ) %>% 
+  layout(title='이륙시 지연과 착륙시 지연의 상관관계',
+         xaxis = list(title = '이륙시간',
+                      zeroline = TRUE
+         ),
+         yaxis = list(title = '이륙 지연시간',
+                      showgrid = FALSE))
+```
+
+<br/>
+
+***
